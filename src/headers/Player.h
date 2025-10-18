@@ -12,6 +12,10 @@ private:
 	double y;
 	double w;
 	double h;
+	double accelerationX;
+	double accelerationY;
+	double previousSpeedX;
+	double previousSpeedY;
 
 public:
 	Player();

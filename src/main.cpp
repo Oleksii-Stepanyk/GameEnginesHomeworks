@@ -16,7 +16,7 @@ using namespace GameConfig;
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
-bool paused;
+bool paused = false;
 std::vector<Player*> players;
 
 constexpr int pausePartsCount = 2;
