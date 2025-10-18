@@ -1,4 +1,4 @@
-#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL.h>
 
@@ -13,16 +13,14 @@
 
 using namespace GameConfig;
 
-/* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 bool paused;
-Player* player; // Create a Player object
+Player* player;
 
-constexpr int pausePartsCount = 2; // Just for fun
+constexpr int pausePartsCount = 2;
 
-/* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
 	SDL_SetAppMetadata("HW2", "0.1", "game-engines.homework-2");
@@ -40,14 +38,13 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	player = new Player(WINDOW_WIDTH/2 - PLAYER_WIDTH, WINDOW_HEIGHT/2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-	return SDL_APP_CONTINUE;  /* carry on with the program! */
+	return SDL_APP_CONTINUE;
 }
 
-/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
 	if (event->type == SDL_EVENT_QUIT) {
-		return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+		return SDL_APP_SUCCESS;
 	}
 	if (event->type == SDL_EVENT_KEY_DOWN) {
 		auto key = event->key.key;
@@ -58,24 +55,19 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 			paused = !paused;
 		}
 	}
-	return SDL_APP_CONTINUE;  /* carry on with the program! */
+	return SDL_APP_CONTINUE;
 }
 
-/* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
+	SDL_SetRenderDrawColor(renderer, 48, 10, 36, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(renderer);
+
 	if (!paused) {
 		player->update();
 	}
-
 	SDL_FRect playerRect = player->getRect();
-	/* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
-	SDL_SetRenderDrawColor(renderer, 48, 10, 36, SDL_ALPHA_OPAQUE);  /* new color, full alpha. */
 
-	/* clear the window to the draw color. */
-	SDL_RenderClear(renderer);
-
-	/* put the newly-cleared rendering on the screen. */
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderRect(renderer, &playerRect);
 	SDL_RenderFillRect(renderer, &playerRect);
@@ -92,11 +84,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		SDL_RenderFillRects(renderer, pauseParts, pausePartsCount);
 	}
 	SDL_RenderPresent(renderer);
-	return SDL_APP_CONTINUE;  /* carry on with the program! */
+	return SDL_APP_CONTINUE;
 }
 
-/* This function runs once at shutdown. */
-void SDL_AppQuit(void* appstate, SDL_AppResult result)
-{
-	/* SDL will clean up the window/renderer for us. */
-}
+void SDL_AppQuit(void* appstate, SDL_AppResult result) { delete player; }
