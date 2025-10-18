@@ -47,58 +47,57 @@ void Player::setSize(double newW, double newH) {
 	h = newH;
 }
 
+static inline void applyFriction(double& acceleration, double friction) {
+	if (acceleration > 0) {
+		acceleration -= friction;
+		if (acceleration < 0) acceleration = 0;
+	}
+	else if (acceleration < 0) {
+		acceleration += friction;
+		if (acceleration > 0) acceleration = 0;
+	}
+	if (std::abs(acceleration) < GameConfig::ACCELERATION_EPSILON) acceleration = 0;
+}
+
+static inline double normalize(double accel, double lowBound, double highBound) {
+	return accel < lowBound ? lowBound : (accel > highBound ? highBound : accel);
+};
+
 void Player::update() {
-	double moveX = 0;
-	double moveY = 0;
-	auto keyStates = SDL_GetKeyboardState(NULL);
+	const double acceleration = GameConfig::ACCELERATION;
+	const double maxAcceleration = GameConfig::MAX_ACCELERATION;
+	const double friction = acceleration * GameConfig::ACCELERATION_BREAK_COEF;
+	const double speed = GameConfig::PLAYER_SPEED;
 
-	if (keyStates[SDL_SCANCODE_W] || keyStates[SDL_SCANCODE_UP]) {
-		moveY -= GameConfig::PLAYER_SPEED;
-		accelerationY += GameConfig::ACCELERATION_PER_FRAME;
-	}
-	if (keyStates[SDL_SCANCODE_S] || keyStates[SDL_SCANCODE_DOWN]) {
-		moveY += GameConfig::PLAYER_SPEED;
-		accelerationY += GameConfig::ACCELERATION_PER_FRAME;
-	}
-	if (keyStates[SDL_SCANCODE_A] || keyStates[SDL_SCANCODE_LEFT]) {
-		moveX -= GameConfig::PLAYER_SPEED;
-		accelerationX += GameConfig::ACCELERATION_PER_FRAME;
-	}
-	if (keyStates[SDL_SCANCODE_D] || keyStates[SDL_SCANCODE_RIGHT]) {
-		moveX += GameConfig::PLAYER_SPEED;
-		accelerationX += GameConfig::ACCELERATION_PER_FRAME;
-	}
-	if (accelerationX > GameConfig::MAX_ACCELERATION) {
-		accelerationX = GameConfig::MAX_ACCELERATION;
-	}
-	if (accelerationY > GameConfig::MAX_ACCELERATION) {
-		accelerationY = GameConfig::MAX_ACCELERATION;
-	}
+	auto key = SDL_GetKeyboardState(NULL);
 
-	if (moveX == 0) {
-		moveX = previousSpeedX;
-	}
-	if (moveY == 0) {
-		moveY = previousSpeedY;
-	}
+	int inputX = (key[SDL_SCANCODE_D] || key[SDL_SCANCODE_RIGHT] ? 1 : 0)
+		- (key[SDL_SCANCODE_A] || key[SDL_SCANCODE_LEFT] ? 1 : 0);
+	int inputY = (key[SDL_SCANCODE_S] || key[SDL_SCANCODE_DOWN] ? 1 : 0)
+		- (key[SDL_SCANCODE_W] || key[SDL_SCANCODE_UP] ? 1 : 0);
 
-	double newX = x + moveX * accelerationX;
-	double newY = y + moveY * accelerationY;
+	accelerationX += inputX * acceleration;
+	accelerationY += inputY * acceleration;
 
-	if (newX < 0 || newX + w > GameConfig::WINDOW_WIDTH) {
+	accelerationX = normalize(accelerationX, -maxAcceleration, maxAcceleration);
+	accelerationY = normalize(accelerationY, -maxAcceleration, maxAcceleration);
+
+	double newX = x + speed * accelerationX;
+	double newY = y + speed * accelerationY;
+
+	if (newX < 0 || newX + w > GameConfig::WINDOW_WIDTH)
+	{
 		newX = x;
+		accelerationX = 0;
 	}
-	if (newY < 0 || newY + h > GameConfig::WINDOW_HEIGHT) {
+	if (newY < 0 || newY + h > GameConfig::WINDOW_HEIGHT)
+	{
 		newY = y;
+		accelerationY = 0;
 	}
 
 	setPosition(newX, newY);
-	
-	accelerationX -= GameConfig::ACCELERATION_PER_FRAME / 1.75;
-	accelerationY -= GameConfig::ACCELERATION_PER_FRAME / 1.75;
-	if (accelerationX < 0) accelerationX = 0;
-	if (accelerationY < 0) accelerationY = 0;
- 
-	previousSpeedX = moveX;
-	previousSpeedY = moveY;
+
+	applyFriction(accelerationX, friction);
+	applyFriction(accelerationY, friction);
 }

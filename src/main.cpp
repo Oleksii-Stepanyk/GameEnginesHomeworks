@@ -37,7 +37,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
-	players.emplace_back(new Player(WINDOW_WIDTH / 4 - PLAYER_WIDTH / 2, WINDOW_HEIGHT / 4 - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT));
 
 	return SDL_APP_CONTINUE;
 }
