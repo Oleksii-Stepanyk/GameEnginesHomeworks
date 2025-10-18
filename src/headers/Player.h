@@ -1,8 +1,11 @@
-#include<vector>
-#include<SDL3/SDL_rect.h>
 #ifndef PLAYER_H
 #define PLAYER_H
-class Player // Square
+
+#include<vector>
+#include<SDL3/SDL.h>
+#include"GameConfig.h"
+
+class Player
 {
 private:
 	double x;
@@ -26,5 +29,7 @@ public:
 
 	void setSize(double newW, double newH);
 	void setPosition(double newX, double newY);
+
+	void update();
 };
 #endif // PLAYER_H
