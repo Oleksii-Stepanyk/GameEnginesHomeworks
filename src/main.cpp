@@ -74,34 +74,31 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 	if (event->type == SDL_EVENT_QUIT) {
 		return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
 	}
-	else if (event->type == SDL_EVENT_KEY_DOWN) {
-		auto key = event->key.key;
-		switch (key) {
-			case SDLK_ESCAPE:
-				return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
-			case SDLK_W:
-			case SDLK_UP:
-				movePlayer(player, 0, -PLAYER_SPEED);
-				break;
-			case SDLK_S:
-			case SDLK_DOWN:
-				movePlayer(player, 0, PLAYER_SPEED);
-				break;
-			case SDLK_A:
-			case SDLK_LEFT:
-				movePlayer(player, -PLAYER_SPEED, 0);
-				break;
-			case SDLK_D:
-			case SDLK_RIGHT:
-				movePlayer(player, PLAYER_SPEED, 0);
-				break;
-			case SDLK_P:
-				paused = !paused;
-				break;
-			default:
-				break;
-		}
+
+	int moveX = 0;
+	int moveY = 0;
+	auto keyStates = SDL_GetKeyboardState(NULL);
+
+	if (keyStates[SDL_SCANCODE_ESCAPE]) {
+		return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
 	}
+	if (keyStates[SDL_SCANCODE_W] || keyStates[SDL_SCANCODE_UP]) {
+		moveY -= PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_S] || keyStates[SDL_SCANCODE_DOWN]) {
+		moveY += PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_A] || keyStates[SDL_SCANCODE_LEFT]) {
+		moveX -= PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_D] || keyStates[SDL_SCANCODE_RIGHT]) {
+		moveX += PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_P]) {
+		paused = !paused;
+	}
+	movePlayer(player, moveX, moveY);
+
 	return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -128,13 +125,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 			pauseParts[i].x = WINDOW_WIDTH - ((pauseParts[i].w * (1.5 * i)) + (WINDOW_WIDTH * 0.05));
 			pauseParts[i].y = WINDOW_HEIGHT * 0.05;
 		}
-
 		SDL_RenderRects(renderer, pauseParts, pausePartsCount);
 		SDL_RenderFillRects(renderer, pauseParts, pausePartsCount);
 	}
-
 	SDL_RenderPresent(renderer);
-
 	return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
