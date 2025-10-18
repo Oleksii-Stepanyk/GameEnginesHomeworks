@@ -16,8 +16,11 @@ namespace GameConfig {
     constexpr double PLAYER_WIDTH = 50.0;
     constexpr double PLAYER_HEIGHT = 50.0;
     constexpr double PLAYER_SPEED = 6.0;
+
     constexpr double MAX_ACCELERATION = 1.0;
-	constexpr double ACCELERATION_PER_FRAME = 0.03;
+	constexpr double ACCELERATION = 0.03;
+    constexpr double ACCELERATION_BREAK_COEF = 0.6;
+	constexpr double ACCELERATION_EPSILON = 0.001;
 }
 
 #endif // GAME_CONFIG_H
