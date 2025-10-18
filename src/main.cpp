@@ -12,9 +12,13 @@
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
-#define PLAYER_SPEED 15
+
 #define PAUSE_HEIGHT 100
 #define PAUSE_WIDTH 40
+
+#define PLAYER_WIDTH 50
+#define PLAYER_HEIGHT 50
+#define PLAYER_SPEED PLAYER_HEIGHT/5
 
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
@@ -27,19 +31,20 @@ constexpr int pausePartsCount = 2; // Just for fun
 
 static void movePlayer(Player* p, double deltaX, double deltaY) {
 	if (paused) return;
+	auto size = p->getSize();
+
 	double newX = p->getX() + deltaX;
 	double newY = p->getY() + deltaY;
-	auto size = p->getSize();
 	double playerWidth = size[0];
 	double playerHeight = size[1];
 
-	if (!(newX < 0 || newX + playerWidth > WINDOW_WIDTH)) {
-		deltaX = newX;
+	if (newX < 0 || newX + playerWidth > WINDOW_WIDTH) {
+		newX = p->getX();
 	}
-	if (!(newY < 0 || newY + playerHeight > WINDOW_HEIGHT)) {
-		deltaY = newY;
+	if (newY < 0 || newY + playerHeight > WINDOW_HEIGHT) {
+		newY = p->getY();
 	}
-	p->setPosition(deltaX, deltaY);
+	p->setPosition(newX, newY);
 }
 
 /* This function runs once at startup. */
@@ -57,11 +62,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		return SDL_APP_FAILURE;
 	}
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
-	
-	int playerWidth = 40;
-	int playerHeight = 40;
 
-	player = new Player(WINDOW_WIDTH/2 - playerHeight, WINDOW_HEIGHT/2 - playerHeight, playerWidth, playerHeight);
+	player = new Player(WINDOW_WIDTH/2 - PLAYER_WIDTH, WINDOW_HEIGHT/2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT);
 
 	return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
