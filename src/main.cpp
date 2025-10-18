@@ -17,7 +17,7 @@ static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 bool paused;
-Player* player;
+std::vector<Player*> players;
 
 constexpr int pausePartsCount = 2;
 
@@ -36,7 +36,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	}
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-	player = new Player(WINDOW_WIDTH/2 - PLAYER_WIDTH, WINDOW_HEIGHT/2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT);
+	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
+	players.emplace_back(new Player(WINDOW_WIDTH / 4 - PLAYER_WIDTH / 2, WINDOW_HEIGHT / 4 - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT));
 
 	return SDL_APP_CONTINUE;
 }
@@ -60,17 +61,26 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
+	const uint64_t frameStartNS = SDL_GetTicksNS();
+
 	SDL_SetRenderDrawColor(renderer, 48, 10, 36, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
 	if (!paused) {
-		player->update();
+		for (Player* player : players)
+		{
+			player->update();
+		}
 	}
-	SDL_FRect playerRect = player->getRect();
 
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-	SDL_RenderRect(renderer, &playerRect);
-	SDL_RenderFillRect(renderer, &playerRect);
+	SDL_FRect playerRects[players.size()];
+	for (size_t i = 0; i < players.size(); i++) {
+		playerRects[i] = players[i]->getRect();
+	}
+
+	SDL_SetRenderDrawColor(renderer, 225, 225, 225, SDL_ALPHA_OPAQUE);
+	SDL_RenderRects(renderer, playerRects, players.size());
+	SDL_RenderFillRects(renderer, playerRects, players.size());
 
 	if (paused) {
 		SDL_FRect pauseParts[pausePartsCount];
@@ -84,7 +94,20 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		SDL_RenderFillRects(renderer, pauseParts, pausePartsCount);
 	}
 	SDL_RenderPresent(renderer);
+
+	const uint64_t frameEndNS = SDL_GetTicksNS();
+	const uint64_t framerateNS = frameEndNS - frameStartNS;
+	if (framerateNS < TARGET_FRAMERATE_NS) {
+		const uint64_t remainingNS = TARGET_FRAMERATE_NS - framerateNS;
+		SDL_DelayNS(remainingNS);
+	}
+
 	return SDL_APP_CONTINUE;
 }
 
-void SDL_AppQuit(void* appstate, SDL_AppResult result) { delete player; }
+void SDL_AppQuit(void* appstate, SDL_AppResult result) {
+	for (size_t i = 0; i < players.size(); i++)
+	{
+		delete players[i];
+	}
+}
