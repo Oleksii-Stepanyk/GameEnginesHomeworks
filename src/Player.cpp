@@ -46,3 +46,32 @@ void Player::setSize(double newW, double newH) {
 	w = newW;
 	h = newH;
 }
+
+void Player::update() {
+	int moveX = 0;
+	int moveY = 0;
+	auto keyStates = SDL_GetKeyboardState(NULL);
+
+	if (keyStates[SDL_SCANCODE_W] || keyStates[SDL_SCANCODE_UP]) {
+		moveY -= GameConfig::PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_S] || keyStates[SDL_SCANCODE_DOWN]) {
+		moveY += GameConfig::PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_A] || keyStates[SDL_SCANCODE_LEFT]) {
+		moveX -= GameConfig::PLAYER_SPEED;
+	}
+	if (keyStates[SDL_SCANCODE_D] || keyStates[SDL_SCANCODE_RIGHT]) {
+		moveX += GameConfig::PLAYER_SPEED;
+	}
+
+	double newX = x + moveX;
+	double newY = y + moveY;
+	if (newX < 0 || newX + w > GameConfig::WINDOW_WIDTH) {
+		newX = x;
+	}
+	if (newY < 0 || newY + h > GameConfig::WINDOW_HEIGHT) {
+		newY = y;
+	}
+	setPosition(newX, newY);
+}
