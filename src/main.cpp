@@ -83,7 +83,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderFillRects(renderer, playerRects, players.size());
 
 	if (paused) {
-		SDL_FRect pauseParts[pausePartsCount];
+		SDL_FRect pauseParts[pausePartsCount]{};
 		for (int i = 0; i < pausePartsCount; i++) {
 			pauseParts[i].w = PAUSE_WIDTH;
 			pauseParts[i].h = PAUSE_HEIGHT;
