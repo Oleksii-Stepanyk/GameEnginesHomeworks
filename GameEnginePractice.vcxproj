@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)include\sdl3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)include\sdl3\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)include\sdl3\include;$(ProjectDir)include\sdl3_image\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)include\sdl3\lib\x64;$(ProjectDir)include\sdl3_image\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)include\sdl3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)include\sdl3\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)include\sdl3\include;$(ProjectDir)include\sdl3_image\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)include\sdl3_image\lib;$(ProjectDir)include\sdl3\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -118,7 +118,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;$(ProjectDir)include\sdl3_image\lib\libSDL3_image.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +135,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;$(ProjectDir)include\sdl3_image\lib\libSDL3_image.dll.a";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

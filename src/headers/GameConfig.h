@@ -2,6 +2,7 @@
 #define GAME_CONFIG_H
 
 #include <stdint.h>
+#include <string>
 
 namespace GameConfig {
     constexpr double TARGET_FPS = 120.0;
@@ -21,6 +22,8 @@ namespace GameConfig {
 	constexpr double ACCELERATION = 0.02;
     constexpr double ACCELERATION_BREAK_COEF = 0.6;
 	constexpr double ACCELERATION_EPSILON = 0.001;
+
+	const std::string ASSETS_PATH = "assets/";
 }
 
 #endif // GAME_CONFIG_H

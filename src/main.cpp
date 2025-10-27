@@ -1,6 +1,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -15,6 +16,7 @@ using namespace GameConfig;
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
+static SDL_Texture* boxTexture = NULL;
 
 bool paused = false;
 std::vector<Player*> players;
@@ -22,9 +24,9 @@ std::vector<SDL_FRect> objects;
 
 constexpr int pausePartsCount = 2;
 
-SDL_FRect CreateRect(float x, float y, float w, float h)
+static SDL_FRect CreateRect(float x, float y, float w, float h)
 {
-	SDL_FRect rect;
+	SDL_FRect rect{};
 	rect.x = x;
 	rect.y = y;
 	rect.w = w;
@@ -34,18 +36,28 @@ SDL_FRect CreateRect(float x, float y, float w, float h)
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-	SDL_SetAppMetadata("HW2", "0.1", "game-engines.homework-2");
+	SDL_Surface* surface = NULL;
+	char* png_path = NULL;
+
+	SDL_SetAppMetadata("HW3", "43.08", "game-engines.homework-3");
 
 	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	if (!SDL_CreateWindowAndRenderer("Homework 2", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+	if (!SDL_CreateWindowAndRenderer("Homework 3", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
 		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+	SDL_asprintf(&png_path, std::string(ASSETS_PATH + "crate.png").c_str(), SDL_GetBasePath());
+	boxTexture = IMG_LoadTexture(renderer, png_path);
+	if (!boxTexture) {
+		SDL_Log("Couldn't load bitmap: %s", SDL_GetError());
+		return SDL_APP_FAILURE;
+	}
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
 	objects.emplace_back(CreateRect(15, 15, 75, 75));
@@ -99,6 +111,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_SetRenderDrawColor(renderer, 219, 171, 83, SDL_ALPHA_OPAQUE);
 	SDL_RenderRects(renderer, objectRects, objects.size());
 	SDL_RenderFillRects(renderer, objectRects, objects.size());
+	
+	for (SDL_FRect object : objects)
+	{
+		SDL_RenderTexture(renderer, boxTexture, NULL, &object);
+	}
 
 	if (paused) {
 		SDL_FRect pauseParts[pausePartsCount]{};
