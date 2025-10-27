@@ -18,8 +18,19 @@ static SDL_Renderer* renderer = NULL;
 
 bool paused = false;
 std::vector<Player*> players;
+std::vector<SDL_FRect> objects;
 
 constexpr int pausePartsCount = 2;
+
+SDL_FRect CreateRect(float x, float y, float w, float h)
+{
+	SDL_FRect rect;
+	rect.x = x;
+	rect.y = y;
+	rect.w = w;
+	rect.h = h;
+	return rect;
+}
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -37,6 +48,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
+	objects.emplace_back(CreateRect(15, 15, 75, 75));
 
 	return SDL_APP_CONTINUE;
 }
@@ -81,6 +93,13 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_RenderRects(renderer, playerRects, players.size());
 	SDL_RenderFillRects(renderer, playerRects, players.size());
 
+	SDL_FRect objectRects[objects.size()];
+	std::copy(objects.begin(), objects.end(), objectRects);
+
+	SDL_SetRenderDrawColor(renderer, 219, 171, 83, SDL_ALPHA_OPAQUE);
+	SDL_RenderRects(renderer, objectRects, objects.size());
+	SDL_RenderFillRects(renderer, objectRects, objects.size());
+
 	if (paused) {
 		SDL_FRect pauseParts[pausePartsCount]{};
 		for (int i = 0; i < pausePartsCount; i++) {
@@ -89,6 +108,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 			pauseParts[i].x = WINDOW_WIDTH - ((pauseParts[i].w * (1.5 * i)) + (WINDOW_WIDTH * 0.05));
 			pauseParts[i].y = WINDOW_HEIGHT * 0.05;
 		}
+		SDL_SetRenderDrawColor(renderer, 225, 225, 225, SDL_ALPHA_OPAQUE);
 		SDL_RenderRects(renderer, pauseParts, pausePartsCount);
 		SDL_RenderFillRects(renderer, pauseParts, pausePartsCount);
 	}

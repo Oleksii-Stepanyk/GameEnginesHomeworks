@@ -1,4 +1,4 @@
-#include "headers/Player.h"
+﻿#include "headers/Player.h"
 
 Player::Player() : x(25), y(25), w(25), h(25), accelerationX(0.0), accelerationY(0.0) {}
 
