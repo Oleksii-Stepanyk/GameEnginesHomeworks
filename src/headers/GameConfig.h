@@ -21,9 +21,12 @@ namespace GameConfig {
     constexpr double MAX_ACCELERATION = 1.0;
 	constexpr double ACCELERATION = 0.02;
     constexpr double ACCELERATION_BREAK_COEF = 0.6;
-	constexpr double ACCELERATION_EPSILON = 0.001;
+    constexpr double ACCELERATION_EPSILON = 0.001;
 
-	const std::string ASSETS_PATH = "assets/";
+    const std::string ASSETS_PATH = "assets/";
+
+    inline bool paused = false;
+    inline bool renderOverlay = false;
 }
 
 #endif // GAME_CONFIG_H

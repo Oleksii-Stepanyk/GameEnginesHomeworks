@@ -135,15 +135,17 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;$(ProjectDir)include\sdl3_image\lib\libSDL3_image.dll.a";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)include\sdl3\lib\x64\SDL3.lib;$(ProjectDir)include\sdl3_image\lib\libSDL3_image.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers\GlobalConfig.h" />
+    <ClInclude Include="src\headers\Object.h" />
     <ClInclude Include="src\headers\Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,6 +7,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include "headers/Player.h"
+#include "headers/Object.h"
 #include "headers/GameConfig.h"
 
 #include <iostream>
@@ -18,22 +19,10 @@ static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Texture* boxTexture = NULL;
 
-bool paused = false;
-bool renderOverlay = false;
 std::vector<Player*> players;
-std::vector<SDL_FRect> objects;
+std::vector<Object*> objects;
 
 constexpr int pausePartsCount = 2;
-
-static SDL_FRect CreateRect(float x, float y, float w, float h)
-{
-	SDL_FRect rect{};
-	rect.x = x;
-	rect.y = y;
-	rect.w = w;
-	rect.h = h;
-	return rect;
-}
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -61,8 +50,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	}
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
-	objects.emplace_back(CreateRect(15, 15, 75, 75));
-	objects.emplace_back(CreateRect(200, 150, 200, 200));
+	objects.emplace_back(new Object(15, 15, 75, 75));
+	objects.emplace_back(new Object(200, 150, 200, 200));
 
 	return SDL_APP_CONTINUE;
 }
@@ -81,7 +70,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 			paused = !paused;
 		}
 		if (key == SDLK_F1) {
-			renderOverlay = !renderOverlay; // toggle overlay mode
+			renderOverlay = !renderOverlay;
 		}
 	}
 	return SDL_APP_CONTINUE;
@@ -101,31 +90,33 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 		}
 	}
 
-	SDL_FRect playerRects[players.size()];
-	for (size_t i = 0; i < players.size(); i++) {
+	const size_t playerCount = players.size();
+	std::vector<SDL_FRect> playerRects(playerCount);
+	
+	for (size_t i = 0; i < playerCount; i++) {
 		playerRects[i] = players[i]->getRect();
 	}
 
 	SDL_SetRenderDrawColor(renderer, 225, 225, 225, SDL_ALPHA_OPAQUE);
-	SDL_RenderRects(renderer, playerRects, players.size());
-	SDL_RenderFillRects(renderer, playerRects, players.size());
+	SDL_RenderRects(renderer, playerRects.data(), players.size());
+	SDL_RenderFillRects(renderer, playerRects.data(), players.size());
 
-	SDL_FRect objectRects[objects.size()];
-	std::copy(objects.begin(), objects.end(), objectRects);
-
-	for (SDL_FRect object : objects)
-	{
-		SDL_RenderTexture(renderer, boxTexture, NULL, &object);
+	const size_t objectCount = objects.size();
+	std::vector<SDL_FRect> objectRects(objectCount);
+	
+	for (size_t i = 0; i < objectCount; i++) {
+		objectRects[i] = objects[i]->getRect();
+		SDL_RenderTexture(renderer, boxTexture, NULL, &objectRects[i]);
 	}
 
 	if (renderOverlay) {
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 		SDL_SetRenderDrawColor(renderer, 219, 171, 83, 75);
-		SDL_RenderFillRects(renderer, objectRects, objects.size());
+		SDL_RenderFillRects(renderer, objectRects.data(), objects.size());
 
 		SDL_SetRenderDrawColor(renderer, 219, 171, 83, 160);
-		SDL_RenderRects(renderer, objectRects, objects.size());
+		SDL_RenderRects(renderer, objectRects.data(), objects.size());
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	}
 	
