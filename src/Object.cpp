@@ -1,8 +1,12 @@
 #include "headers/Object.h"
 
-Object::Object() : x(25), y(25), w(25), h(25) {}
+Object::Object() : x(25), y(25), w(25), h(25), textureId("") {}
 
-Object::Object(double startX, double startY, double startW, double startH) : x(startX), y(startY), w(startW), h(startH) {}
+Object::Object(double startX, double startY, double startW, double startH)
+	: x(startX), y(startY), w(startW), h(startH), textureId("") {}
+
+Object::Object(double startX, double startY, double startW, double startH, const std::string& textureId)
+	: x(startX), y(startY), w(startW), h(startH), textureId(textureId) {}
 
 double Object::getX() const {
 	return x;
@@ -27,6 +31,10 @@ SDL_FRect Object::getRect() const {
 	rect.w = static_cast<float>(w);
 	rect.h = static_cast<float>(h);
 	return rect;
+}
+
+std::string Object::getTextureId() const {
+	return textureId;
 }
 
 std::vector<double> Object::getPosition() const {

@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include<vector>
-#include<SDL3/SDL.h>
-#include"Object.h"
-#include"GameConfig.h"
+#include <vector>
+#include <SDL3/SDL.h>
+#include "Object.h"
+#include "GameConfig.h"
 
 class Player : public Object
 {

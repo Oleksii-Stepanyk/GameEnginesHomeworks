@@ -8,21 +8,49 @@
 
 #include "headers/Player.h"
 #include "headers/Object.h"
+#include "headers/Textures.h"
 #include "headers/GameConfig.h"
 
 #include <iostream>
 #include <thread>
+#include <unordered_map>
 
 using namespace GameConfig;
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
-static SDL_Texture* boxTexture = NULL;
 
 std::vector<Player*> players;
 std::vector<Object*> objects;
 
 constexpr int pausePartsCount = 2;
+const std::vector<std::pair<std::string, std::string>> texturePaths = {
+	std::pair("crate.png", TextureID::Crate), std::pair("Barrel3.png", TextureID::Barrel)
+};
+
+std::unordered_map<std::string, SDL_Texture*> loadedTextures;
+
+static bool loadTexture(const std::string &path, const std::string &identifier) {
+	char* png_path = NULL;
+
+	SDL_asprintf(&png_path, std::string(ASSETS_PATH + path).c_str(), SDL_GetBasePath());
+	SDL_Texture* texture = IMG_LoadTexture(renderer, png_path);
+	
+	if (!texture) {
+		SDL_Log("Couldn't load bitmap: %s", SDL_GetError());
+		return true;
+	}
+	loadedTextures[identifier] = texture;
+	return false;
+}
+
+static SDL_Texture* getTexture(const std::string &identifier) {
+	auto it = loadedTextures.find(identifier);
+	if (it != loadedTextures.end()) {
+		return it->second;
+	}
+	return nullptr;
+}
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -42,16 +70,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 	}
 	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-	SDL_asprintf(&png_path, std::string(ASSETS_PATH + "crate.png").c_str(), SDL_GetBasePath());
-	boxTexture = IMG_LoadTexture(renderer, png_path);
-	if (!boxTexture) {
-		SDL_Log("Couldn't load bitmap: %s", SDL_GetError());
-		return SDL_APP_FAILURE;
+	for (const auto& texturePath : texturePaths) {
+		if (loadTexture(texturePath.first, texturePath.second)) {
+			return SDL_APP_FAILURE;
+		}
 	}
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
-	objects.emplace_back(new Object(15, 15, 75, 75));
-	objects.emplace_back(new Object(200, 150, 200, 200));
+	objects.emplace_back(new Object(15, 15, 100, 100, TextureID::Crate));
+	objects.emplace_back(new Object(200, 150, 100, 100, TextureID::Barrel));
 
 	return SDL_APP_CONTINUE;
 }
@@ -106,7 +133,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	
 	for (size_t i = 0; i < objectCount; i++) {
 		objectRects[i] = objects[i]->getRect();
-		SDL_RenderTexture(renderer, boxTexture, NULL, &objectRects[i]);
+		SDL_Texture* texture = getTexture(objects[i]->getTextureId());
+		SDL_RenderTexture(renderer, texture, NULL, &objectRects[i]);
 	}
 
 	if (renderOverlay) {

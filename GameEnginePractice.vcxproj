@@ -147,6 +147,7 @@
     <ClInclude Include="src\headers\GlobalConfig.h" />
     <ClInclude Include="src\headers\Object.h" />
     <ClInclude Include="src\headers\Player.h" />
+    <ClInclude Include="src\headers\Textures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
