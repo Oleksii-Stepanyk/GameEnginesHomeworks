@@ -1,8 +1,12 @@
 ﻿#include "headers/Player.h"
 
 Player::Player() : Object(), accelerationX(0.0), accelerationY(0.0) {}
+
 Player::Player(double startX, double startY, double startW, double startH)
 	: Object(startX, startY, startW, startH), accelerationX(0.0), accelerationY(0.0) {}
+
+Player::Player(double startX, double startY, double startW, double startH, const std::string& textureId)
+	: Object(startX, startY, startW, startH, textureId), accelerationX(0.0), accelerationY(0.0) {}
 
 static inline void applyFriction(double& acceleration, double friction) {
 	if (acceleration > 0) {

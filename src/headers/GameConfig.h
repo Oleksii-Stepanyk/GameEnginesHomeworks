@@ -13,7 +13,7 @@ namespace GameConfig {
 
     constexpr double PAUSE_WIDTH = 20;
     constexpr double PAUSE_HEIGHT = 50;
-
+    
     constexpr double PLAYER_WIDTH = 50.0;
     constexpr double PLAYER_HEIGHT = 50.0;
     constexpr double PLAYER_SPEED = 420.0 / TARGET_FPS;

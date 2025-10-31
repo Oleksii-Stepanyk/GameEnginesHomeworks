@@ -15,6 +15,7 @@ private:
 public:
 	Player();
 	Player(double startX, double startY, double startW, double startH);
+	Player(double startX, double startY, double startW, double startH, const std::string& textureId);
 
 	void update();
 };
