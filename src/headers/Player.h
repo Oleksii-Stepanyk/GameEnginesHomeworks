@@ -18,5 +18,9 @@ public:
 	Player(double startX, double startY, double startW, double startH, const std::string& textureId);
 
 	void update();
+	
+	void resetAccelerationX();
+	void resetAccelerationY();
+	void resetAcceleration();
 };
 #endif // PLAYER_H

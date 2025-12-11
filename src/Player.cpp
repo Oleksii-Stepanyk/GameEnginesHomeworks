@@ -62,3 +62,16 @@ void Player::update() {
 	applyFriction(accelerationX, friction);
 	applyFriction(accelerationY, friction);
 }
+
+void Player::resetAccelerationX() {
+	accelerationX = 0.0;
+}
+
+void Player::resetAccelerationY() {
+	accelerationY = 0.0;
+}
+
+void Player::resetAcceleration() {
+	accelerationX = 0.0;
+	accelerationY = 0.0;
+}

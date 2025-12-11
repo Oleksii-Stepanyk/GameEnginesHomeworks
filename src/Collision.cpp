@@ -1,4 +1,5 @@
 #include "headers/Collision.h"
+#include "headers/Player.h"
 #include <algorithm>
 #include <cmath>
 
@@ -116,6 +117,16 @@ void CollisionSystem::resolveCollisions(const std::vector<CollisionInfo>& collis
 					posBY + collision.normalY * adjustedDepth
 				);
 			}
+			
+			Player* playerB = dynamic_cast<Player*>(objB);
+			if (playerB) {
+				if (std::abs(collision.normalX) > 0.5) {
+					playerB->resetAccelerationX();
+				}
+				if (std::abs(collision.normalY) > 0.5) {
+					playerB->resetAccelerationY();
+				}
+			}
 		}
 		else if (bIsStatic) {
 			if (shapeA == CollisionShape::Sphere) {
@@ -131,6 +142,16 @@ void CollisionSystem::resolveCollisions(const std::vector<CollisionInfo>& collis
 					posAX - collision.normalX * adjustedDepth,
 					posAY - collision.normalY * adjustedDepth
 				);
+			}
+			
+			Player* playerA = dynamic_cast<Player*>(objA);
+			if (playerA) {
+				if (std::abs(collision.normalX) > 0.5) {
+					playerA->resetAccelerationX();
+				}
+				if (std::abs(collision.normalY) > 0.5) {
+					playerA->resetAccelerationY();
+				}
 			}
 		}
 		else {
