@@ -139,11 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Collision.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\headers\Collision.h" />
+    <ClInclude Include="src\headers\GameConfig.h" />
     <ClInclude Include="src\headers\GlobalConfig.h" />
     <ClInclude Include="src\headers\Object.h" />
     <ClInclude Include="src\headers\Player.h" />
