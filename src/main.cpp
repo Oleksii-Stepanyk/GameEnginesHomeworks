@@ -53,6 +53,36 @@ static SDL_Texture* getTexture(const std::string& identifier) {
 	return nullptr;
 }
 
+static void renderFilledCircle(SDL_Renderer* renderer, float centerX, float centerY, float radius) {
+	const int diameter = static_cast<int>(radius * 2);
+	const float radiusSquared = radius * radius;
+	
+	for (int y = 0; y <= diameter; y++) {
+		for (int x = 0; x <= diameter; x++) {
+			float dx = radius - x;
+			float dy = radius - y;
+			if ((dx * dx + dy * dy) <= radiusSquared) {
+				SDL_RenderPoint(renderer, centerX + dx, centerY + dy);
+			}
+		}
+	}
+}
+
+static void renderCircleOutline(SDL_Renderer* renderer, float centerX, float centerY, float radius) {
+	const int segments = 64;
+	for (int i = 0; i < segments; i++) {
+		float angle1 = (i * 2.0f * glm::pi<float>()) / segments;
+		float angle2 = ((i + 1) * 2.0f * glm::pi<float>()) / segments;
+		
+		float x1 = centerX + radius * cosf(angle1);
+		float y1 = centerY + radius * sinf(angle1);
+		float x2 = centerX + radius * cosf(angle2);
+		float y2 = centerY + radius * sinf(angle2);
+		
+		SDL_RenderLine(renderer, x1, y1, x2, y2);
+	}
+}
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
 	SDL_Surface* surface = NULL;
@@ -90,7 +120,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		const char* shapeStr = (other->getShape() == CollisionShape::Sphere) ? "sphere" : "box";
 		SDL_Log("BOX TRIGGER activated by %s at (%.2f, %.2f)!", shapeStr, other->getX(), other->getY());
 		});
-	trigger1->setContinuous(false);
+	trigger1->setContinuous(true);
 	objects.emplace_back(trigger1);
 	
 	
@@ -116,7 +146,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 		const char* shapeStr = (other->getShape() == CollisionShape::Sphere) ? "sphere" : "box";
 		SDL_Log("SPHERE TRIGGER activated by %s at (%.2f, %.2f)!", shapeStr, other->getX(), other->getY());
 		});
-	sphereTrigger->setContinuous(false);
+	sphereTrigger->setContinuous(true);
 	objects.emplace_back(sphereTrigger);
 
 	return SDL_APP_CONTINUE;
@@ -179,9 +209,23 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	std::vector<SDL_FRect> objectRects(objectCount);
 
 	for (size_t i = 0; i < objectCount; i++) {
-		objectRects[i] = objects[i]->getRect();
+		CollisionShape shape = objects[i]->getShape();
 		SDL_Texture* texture = getTexture(objects[i]->getTextureId());
-		SDL_RenderTexture(renderer, texture, NULL, &objectRects[i]);
+		
+		if (shape == CollisionShape::Sphere) {
+			float centerX = static_cast<float>(objects[i]->getCenterX());
+			float centerY = static_cast<float>(objects[i]->getCenterY());
+			float radius = static_cast<float>(objects[i]->getRadius());
+
+			SDL_SetRenderDrawColor(renderer, 180, 140, 80, 255);
+			renderFilledCircle(renderer, centerX, centerY, radius);
+			
+			SDL_SetRenderDrawColor(renderer, 120, 90, 50, 255);
+			renderCircleOutline(renderer, centerX, centerY, radius);
+		} else {
+			objectRects[i] = objects[i]->getRect();
+			SDL_RenderTexture(renderer, texture, NULL, &objectRects[i]);
+		}
 	}
 
 	if (renderOverlay) {
@@ -215,8 +259,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 			
 			if (shape == CollisionShape::Sphere) {
 				SDL_FRect* rect = &objectRects[i];
-				SDL_RenderLine(renderer, rect->x, rect->y, rect->x + rect->w, rect->y + rect->h);
-				SDL_RenderLine(renderer, rect->x + rect->w, rect->y, rect->x, rect->y + rect->h);
+
+				float centerX = static_cast<float>(objects[i]->getCenterX());
+				float centerY = static_cast<float>(objects[i]->getCenterY());
+				float radius = static_cast<float>(objects[i]->getRadius());
+				renderCircleOutline(renderer, centerX, centerY, radius);
 			}
 		}
 

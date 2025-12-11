@@ -58,6 +58,19 @@ std::vector<double> Object::getSize() const {
 	return { w, h };
 }
 
+double Object::getCenterX() const {
+	return x + w / 2.0;
+}
+
+double Object::getCenterY() const {
+	return y + h / 2.0;
+}
+
+void Object::setCenterPosition(double centerX, double centerY) {
+	x = centerX - w / 2.0;
+	y = centerY - h / 2.0;
+}
+
 void Object::setPosition(double newX, double newY) {
 	x = newX;
 	y = newY;

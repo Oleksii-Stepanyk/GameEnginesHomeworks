@@ -54,6 +54,10 @@ public:
 	std::vector<double> getPosition() const;
 	std::vector<double> getSize() const;
 
+	double getCenterX() const;
+	double getCenterY() const;
+	void setCenterPosition(double centerX, double centerY);
+
 	void setSize(double newW, double newH);
 	void setPosition(double newX, double newY);
 	
