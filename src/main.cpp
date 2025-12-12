@@ -21,6 +21,8 @@ using namespace GameConfig;
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
+bool terminated = false;
+
 std::vector<Player*> players;
 std::vector<Object*> objects;
 
@@ -69,10 +71,9 @@ static void renderFilledCircle(SDL_Renderer* renderer, float centerX, float cent
 }
 
 static void renderCircleOutline(SDL_Renderer* renderer, float centerX, float centerY, float radius) {
-	const int segments = 64;
-	for (int i = 0; i < segments; i++) {
-		float angle1 = (i * 2.0f * glm::pi<float>()) / segments;
-		float angle2 = ((i + 1) * 2.0f * glm::pi<float>()) / segments;
+	for (int i = 0; i < SPHERE_SEGMENTS; i++) {
+		float angle1 = (i * 2.0f * glm::pi<float>()) / SPHERE_SEGMENTS;
+		float angle2 = ((i + 1) * 2.0f * glm::pi<float>()) / SPHERE_SEGMENTS;
 		
 		float x1 = centerX + radius * cosf(angle1);
 		float y1 = centerY + radius * sinf(angle1);
@@ -109,44 +110,26 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 	players.emplace_back(new Player(WINDOW_WIDTH / 2 - PLAYER_WIDTH, WINDOW_HEIGHT / 2 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT));
 
-	objects.emplace_back(new Object(15, 15, 100, 100, TextureID::Crate));
-	objects.emplace_back(new Object(200, 150, 100, 100, TextureID::Barrel));
+	objects.emplace_back(new Object(75, 75, 100, 100, TextureID::Crate));
+	objects.emplace_back(new Object(200, 150, 100, 100, TextureID::Barrel, CollisionShape::Sphere));
 
-	Object* wall1 = new Object(60, 200, 80, 300, TextureID::Crate, ObjectType::Static);
-	objects.emplace_back(wall1);
+	objects.emplace_back(new Object(60, 200, 80, 300, ObjectType::Static));
 
-	Object* trigger1 = new Object(900, 300, 120, 120, TextureID::Barrel, ObjectType::Trigger);
-	trigger1->setTriggerCallback([](Object* other) {
+	Object* trigger = new Object(900, 300, 120, 120, TextureID::Crate, ObjectType::Trigger);
+	trigger->setTriggerCallback([](Object* other) {
 		const char* shapeStr = (other->getShape() == CollisionShape::Sphere) ? "sphere" : "box";
 		SDL_Log("BOX TRIGGER activated by %s at (%.2f, %.2f)!", shapeStr, other->getX(), other->getY());
 		});
-	trigger1->setContinuous(true);
-	objects.emplace_back(trigger1);
+	objects.emplace_back(trigger);
 	
+	objects.emplace_back(new Object(250, 400, 60, 60, TextureID::Barrel, CollisionShape::Sphere));
+	objects.emplace_back(new Object(700, 100, 80, 80, TextureID::Barrel, ObjectType::Static, CollisionShape::Sphere));
 	
-	Object* sphere1 = new Object(250, 400, 60, 60, TextureID::Barrel);
-	sphere1->setShape(CollisionShape::Sphere);
-	sphere1->setRadius(30.0);
-	objects.emplace_back(sphere1);
-	
-	Object* sphere2 = new Object(350, 400, 50, 50, TextureID::Barrel);
-	sphere2->setShape(CollisionShape::Sphere);
-	sphere2->setRadius(25.0);
-	objects.emplace_back(sphere2);
-	
-	Object* sphereWall = new Object(700, 100, 80, 80, TextureID::Barrel, ObjectType::Static);
-	sphereWall->setShape(CollisionShape::Sphere);
-	sphereWall->setRadius(40.0);
-	objects.emplace_back(sphereWall);
-	
-	Object* sphereTrigger = new Object(1000, 450, 100, 100, TextureID::Barrel, ObjectType::Trigger);
-	sphereTrigger->setShape(CollisionShape::Sphere);
-	sphereTrigger->setRadius(50.0);
-	sphereTrigger->setTriggerCallback([](Object* other) {
+	Object* sphereTrigger = new Object(1000, 450, 100, 100, TextureID::Barrel, ObjectType::Trigger, CollisionShape::Sphere);
+	sphereTrigger->setTriggerCallback([&](Object* other) {
 		const char* shapeStr = (other->getShape() == CollisionShape::Sphere) ? "sphere" : "box";
-		SDL_Log("SPHERE TRIGGER activated by %s at (%.2f, %.2f)!", shapeStr, other->getX(), other->getY());
+		terminated = true;
 		});
-	sphereTrigger->setContinuous(true);
 	objects.emplace_back(sphereTrigger);
 
 	return SDL_APP_CONTINUE;
@@ -179,6 +162,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 	SDL_SetRenderDrawColor(renderer, 48, 10, 36, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
+	if (terminated) {
+		return SDL_APP_SUCCESS;
+	}
 	if (!paused) {
 		for (Player* player : players)
 		{
@@ -217,14 +203,19 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 			float centerY = static_cast<float>(objects[i]->getCenterY());
 			float radius = static_cast<float>(objects[i]->getRadius());
 
-			SDL_SetRenderDrawColor(renderer, 180, 140, 80, 255);
+			SDL_SetRenderDrawColor(renderer, 36, 50, 41, 255);
 			renderFilledCircle(renderer, centerX, centerY, radius);
 			
-			SDL_SetRenderDrawColor(renderer, 120, 90, 50, 255);
+			SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
 			renderCircleOutline(renderer, centerX, centerY, radius);
 		} else {
 			objectRects[i] = objects[i]->getRect();
 			SDL_RenderTexture(renderer, texture, NULL, &objectRects[i]);
+		}
+
+		if (texture == nullptr) {
+			SDL_SetRenderDrawColor(renderer, 100, 50, 50, 255);
+			SDL_RenderFillRect(renderer, &objectRects[i]);
 		}
 	}
 
@@ -264,6 +255,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 				float centerY = static_cast<float>(objects[i]->getCenterY());
 				float radius = static_cast<float>(objects[i]->getRadius());
 				renderCircleOutline(renderer, centerX, centerY, radius);
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 25);
+				renderFilledCircle(renderer, centerX, centerY, radius);
 			}
 		}
 

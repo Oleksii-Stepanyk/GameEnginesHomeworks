@@ -23,6 +23,8 @@ namespace GameConfig {
     constexpr double ACCELERATION_BREAK_COEF = 0.6;
     constexpr double ACCELERATION_EPSILON = 0.001;
 
+	constexpr int SPHERE_SEGMENTS = 256;
+
     constexpr std::string ASSETS_PATH = "assets/";
 
     inline bool paused = false;

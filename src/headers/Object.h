@@ -25,12 +25,12 @@ protected:
 	double w;
 	double h;
 	std::string textureId;
-	
+
 	ObjectType type;
 	CollisionShape shape;
 	double radius;
 	bool isImmovable;
-	
+
 	std::function<void(Object*)> onTriggerCallback;
 	bool isTriggered;
 	bool isContinuous;
@@ -38,9 +38,14 @@ protected:
 public:
 	Object();
 	Object(double startX, double startY, double startW, double startH);
-	Object(double startX, double startY, double startW, double startH, const std::string &textureId);
-	Object(double startX, double startY, double startW, double startH, const std::string &textureId, ObjectType objType);
-	
+	Object(double startX, double startY, double startW, double startH, ObjectType objType);
+	Object(double startX, double startY, double startW, double startH, CollisionShape collisionShape);
+	Object(double startX, double startY, double startW, double startH, ObjectType objType, CollisionShape collisionShape);
+	Object(double startX, double startY, double startW, double startH, const std::string& textureId);
+	Object(double startX, double startY, double startW, double startH, const std::string& textureId, ObjectType objType);
+	Object(double startX, double startY, double startW, double startH, const std::string& textureId, CollisionShape collisionShape);
+	Object(double startX, double startY, double startW, double startH, const std::string& textureId, ObjectType objType, CollisionShape collisionShape);
+
 	virtual ~Object() = default;
 
 	double getX() const;
@@ -60,18 +65,18 @@ public:
 
 	void setSize(double newW, double newH);
 	void setPosition(double newX, double newY);
-	
+
 	ObjectType getType() const;
 	void setType(ObjectType objType);
-	
+
 	bool getIsImmovable() const;
 	void setImmovable(bool immovable);
-	
+
 	CollisionShape getShape() const;
 	void setShape(CollisionShape collisionShape);
 	double getRadius() const;
 	void setRadius(double r);
-	
+
 	void setTriggerCallback(std::function<void(Object*)> callback);
 	void trigger(Object* other);
 	void resetTrigger();

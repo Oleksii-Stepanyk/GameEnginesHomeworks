@@ -2,24 +2,58 @@
 #include <algorithm>
 
 Object::Object()
-: x(25), y(25), w(25), h(25), textureId(""),
-type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(12.5), isImmovable(false),
-onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {}
+	: x(25), y(25), w(25), h(25), textureId(""),
+	type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(12.5), isImmovable(false),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
 
 Object::Object(double startX, double startY, double startW, double startH)
-: x(startX), y(startY), w(startW), h(startH), textureId(""),
-type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(false),
-onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {}
+	: x(startX), y(startY), w(startW), h(startH), textureId(""),
+	type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(false),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
+
+Object::Object(double startX, double startY, double startW, double startH, ObjectType objType)
+	: x(startX), y(startY), w(startW), h(startH), textureId(""),
+	type(objType), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(objType == ObjectType::Static),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
+
+Object::Object(double startX, double startY, double startW, double startH, CollisionShape collisionShape)
+	: x(startX), y(startY), w(startW), h(startH), textureId(""),
+	type(ObjectType::Dynamic), shape(collisionShape), radius(std::min(startW, startH) / 2.0), isImmovable(false),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
+
+Object::Object(double startX, double startY, double startW, double startH, ObjectType objType, CollisionShape collisionShape)
+	: x(startX), y(startY), w(startW), h(startH), textureId(""),
+	type(objType), shape(collisionShape), radius(std::min(startW, startH) / 2.0), isImmovable(objType == ObjectType::Static),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
 
 Object::Object(double startX, double startY, double startW, double startH, const std::string& textureId)
-: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
-type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(false),
-onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {}
+	: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
+	type(ObjectType::Dynamic), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(false),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
 
 Object::Object(double startX, double startY, double startW, double startH, const std::string& textureId, ObjectType objType)
-: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
-type(objType), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(objType == ObjectType::Static),
-onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {}
+	: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
+	type(objType), shape(CollisionShape::Box), radius(std::min(startW, startH) / 2.0), isImmovable(objType == ObjectType::Static),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
+
+Object::Object(double startX, double startY, double startW, double startH, const std::string& textureId, CollisionShape collisionShape)
+	: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
+	type(ObjectType::Dynamic), shape(collisionShape), radius(std::min(startW, startH) / 2.0), isImmovable(false),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
+
+Object::Object(double startX, double startY, double startW, double startH, const std::string& textureId, ObjectType objType, CollisionShape collisionShape)
+	: x(startX), y(startY), w(startW), h(startH), textureId(textureId),
+	type(objType), shape(collisionShape), radius(std::min(startW, startH) / 2.0), isImmovable(objType == ObjectType::Static),
+	onTriggerCallback(nullptr), isTriggered(false), isContinuous(false) {
+}
 
 double Object::getX() const {
 	return x;
